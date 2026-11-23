@@ -33,6 +33,8 @@
   let currentStoryboard = [];
   let toastTimer;
   let generating = false;
+  let videoGenerating = false;
+  let searchAnimTimer = null;
 
   if (!Array.isArray(projects)) projects = [];
 
@@ -386,6 +388,186 @@ Produire une vidéo qui respecte fidèlement le concept initial et l'ensemble de
     `).join("");
   }
 
+  function parseDurationSeconds(durationLabel) {
+    const match = String(durationLabel || "").match(/\d+/);
+    const num = match ? Number(match[0]) : 10;
+    return Math.min(Math.max(num || 10, 3), 60);
+  }
+
+  function ensureVideoUI() {
+    const resultSection = $("#result");
+    if (!resultSection) return null;
+
+    let box = $("#motion-video-box");
+    if (!box) {
+      box = document.createElement("div");
+      box.id = "motion-video-box";
+      box.style.marginTop = "24px";
+      box.style.padding = "18px";
+      box.style.borderRadius = "14px";
+      box.style.border = "1px solid rgba(168, 85, 247, 0.35)";
+      box.style.background = "rgba(15, 23, 42, 0.78)";
+
+      box.innerHTML = `
+        <style>
+          @keyframes motionPulseBar {
+            0% { transform: translateX(-100%); }
+            50% { transform: translateX(140%); }
+            100% { transform: translateX(-100%); }
+          }
+          #video-search-loader.active {
+            display: block !important;
+          }
+          #video-search-bar {
+            width: 42%;
+            height: 100%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #7c3aed, #a855f7, #38bdf8);
+            animation: motionPulseBar 1.6s ease-in-out infinite;
+          }
+        </style>
+        <button type="button" class="primary-button" id="generate-video-mp4">
+          Générer la vidéo (.mp4)
+        </button>
+        <div id="video-search-loader" style="display:none;margin-top:14px;">
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#cbd5e1;margin-bottom:8px;">
+            <span id="video-search-step">Recherche des scènes et préparation du rendu...</span>
+          </div>
+          <div style="width:100%;height:6px;border-radius:999px;background:rgba(255,255,255,0.12);overflow:hidden;">
+            <div id="video-search-bar"></div>
+          </div>
+        </div>
+        <p id="video-status-text" style="margin-top:10px;font-size:14px;opacity:0.9;"></p>
+        <div id="video-player-wrap" style="margin-top:14px;"></div>
+      `;
+
+      const promptBox = $("#generated-prompt")?.parentElement;
+      if (promptBox && promptBox.parentElement === resultSection) {
+        promptBox.insertAdjacentElement("afterend", box);
+      } else {
+        resultSection.appendChild(box);
+      }
+    }
+
+    return box;
+  }
+
+  function startSearchAnimation(statusEl) {
+    const loader = $("#video-search-loader");
+    const stepEl = $("#video-search-step");
+    if (loader) loader.classList.add("active");
+
+    const phrases = [
+      "Recherche et analyse de tes choix de scène...",
+      "Assemblage du style visuel et de la caméra...",
+      "Rendu vidéo .mp4 en cours sur le serveur...",
+      "Finalisation et vérification de la vidéo..."
+    ];
+    let idx = 0;
+
+    if (stepEl) stepEl.textContent = phrases[0];
+    if (statusEl) statusEl.textContent = "";
+
+    clearInterval(searchAnimTimer);
+    searchAnimTimer = setInterval(() => {
+      idx = (idx + 1) % phrases.length;
+      if (stepEl) stepEl.textContent = phrases[idx];
+    }, 2400);
+  }
+
+  function stopSearchAnimation() {
+    clearInterval(searchAnimTimer);
+    searchAnimTimer = null;
+    const loader = $("#video-search-loader");
+    if (loader) loader.classList.remove("active");
+  }
+
+  async function generateVideoFromChoices() {
+    if (videoGenerating) return;
+    videoGenerating = true;
+
+    const ui = ensureVideoUI();
+    const btn = $("#generate-video-mp4");
+    const statusEl = $("#video-status-text");
+    const playerWrap = $("#video-player-wrap");
+
+    if (!ui || !btn || !statusEl || !playerWrap) {
+      videoGenerating = false;
+      return;
+    }
+
+    const a = currentAnswers || {};
+    const promptText = $("#generated-prompt")?.textContent || a.idea || "Vidéo MOTION AI";
+    const titleText = (a.idea || "MOTION AI").slice(0, 50);
+    const durationSec = parseDurationSeconds(a.duration);
+
+    btn.disabled = true;
+    btn.textContent = "Recherche & rendu en cours...";
+    playerWrap.innerHTML = "";
+    startSearchAnimation(statusEl);
+
+    try {
+      const response = await fetch("/api/video", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: titleText,
+          script: `${a.idea || ""} — ${a.mood || ""} (${a.camera || ""}) | ${promptText.slice(0, 120)}`,
+          style: a.style || "Cinématique",
+          format: a.format || "16:9",
+          duration: durationSec
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok && response.status !== 202) {
+        throw new Error(data.error || `Erreur (${response.status})`);
+      }
+
+      stopSearchAnimation();
+
+      if (data.url) {
+        statusEl.textContent = "Vidéo prête !";
+        playerWrap.innerHTML = `
+          <video
+            controls
+            playsinline
+            src="${escapeHTML(data.url)}"
+            style="width:100%;max-height:420px;border-radius:12px;background:#000;"
+          ></video>
+          <div style="margin-top:10px;">
+            <a
+              href="${escapeHTML(data.url)}"
+              download="motion-ai.mp4"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="secondary-button"
+              style="display:inline-block;text-decoration:none;"
+            >
+              Télécharger le .mp4
+            </a>
+          </div>
+        `;
+        showToast("Vidéo générée avec succès !");
+      } else {
+        statusEl.textContent = data.message || "La vidéo est toujours en cours de rendu, réessaie dans quelques secondes.";
+        showToast("Rendu toujours en cours...");
+      }
+    } catch (err) {
+      stopSearchAnimation();
+      console.error("Vidéo MOTION AI :", err);
+      statusEl.textContent = `Impossible de générer la vidéo : ${err.message}`;
+      showToast("Erreur lors de la génération vidéo.");
+    } finally {
+      videoGenerating = false;
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = "Générer la vidéo (.mp4)";
+      }
+    }
+  }
+
   async function generateResult() {
     if (generating) return;
 
@@ -404,6 +586,7 @@ Produire une vidéo qui respecte fidèlement le concept initial et l'ensemble de
 
       $("#generated-prompt").textContent = result.prompt;
       renderStoryboard(currentStoryboard);
+      ensureVideoUI();
 
       currentProjectId = null;
       showPage("result");
@@ -417,6 +600,7 @@ Produire une vidéo qui respecte fidèlement le concept initial et l'ensemble de
 
       $("#generated-prompt").textContent = makePrompt();
       renderStoryboard(currentStoryboard);
+      ensureVideoUI();
 
       showToast("Gemini indisponible : résultat de secours affiché.");
       showPage("result");
@@ -518,6 +702,7 @@ Produire une vidéo qui respecte fidèlement le concept initial et l'ensemble de
 
     $("#generated-prompt").textContent = project.prompt || "";
     renderStoryboard(currentStoryboard);
+    ensureVideoUI();
 
     showPage("result");
   }
@@ -731,6 +916,10 @@ Produire une vidéo qui respecte fidèlement le concept initial et l'ensemble de
           currentStep--;
           renderStep();
         }
+        break;
+
+      case "generate-video-mp4":
+        generateVideoFromChoices();
         break;
 
       case "copy-prompt":
