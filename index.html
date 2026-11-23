@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MOTION AI</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <a href="#" class="brand" data-page="home">
+      <span class="brand-icon">M</span>
+      <span>MOTION <strong>AI</strong></span>
+    </a>
+
+    <nav class="main-nav">
+      <button class="nav-link active" data-page="home">Accueil</button>
+      <button class="nav-link" data-page="creator">Créer</button>
+      <button class="nav-link" data-page="guide">Guide</button>
+      <button class="nav-link" data-page="history">Mes projets</button>
+    </nav>
+
+    <div class="top-actions">
+      <span id="account-status">Mode invité</span>
+      <button class="account-button" id="account-button">Compte</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- ACCUEIL -->
+    <section class="page active" id="home">
+      <div class="hero">
+        <div class="hero-content">
+          <span class="eyebrow">✦ CREATIVE STUDIO INTELLIGENT</span>
+          <h1>Donne vie à tes<br><span>idées vidéo.</span></h1>
+          <p>
+            Transforme une simple idée en un prompt vidéo détaillé
+            et un storyboard prêt à être utilisé avec tes outils de création.
+          </p>
+
+          <div class="hero-buttons">
+            <button class="primary-button" data-page="creator">
+              Commencer à créer <span>→</span>
+            </button>
+            <button class="secondary-button" data-page="guide">
+              Découvrir le fonctionnement
+            </button>
+          </div>
+
+          <div class="hero-stats">
+            <div><strong>01</strong><span>Imagine</span></div>
+            <div><strong>02</strong><span>Personnalise</span></div>
+            <div><strong>03</strong><span>Génère ton prompt</span></div>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <div class="visual-glow"></div>
+          <div class="visual-card">
+            <div class="visual-top">
+              <span class="live-dot"></span>
+              <span>CREATIVE PREVIEW</span>
+              <span>•••</span>
+            </div>
+            <div class="preview-scene">
+              <div class="scene-sun"></div>
+              <div class="scene-mountain mountain-one"></div>
+              <div class="scene-mountain mountain-two"></div>
+              <div class="scene-ground"></div>
+              <div class="scene-caption">CREATE YOUR VISION</div>
+            </div>
+            <div class="visual-bottom">
+              <div>
+                <small>PROJECT TYPE</small>
+                <strong>Cinematic video</strong>
+              </div>
+              <span class="preview-tag">16:9</span>
+            </div>
+          </div>
+          <div class="floating-card floating-one">✦ Prompt intelligent</div>
+          <div class="floating-card floating-two">◈ Storyboard</div>
+        </div>
+      </div>
+
+      <div class="section-heading">
+        <span class="eyebrow">TON ESPACE CRÉATIF</span>
+        <h2>Tout commence par une idée.</h2>
+        <p>Des outils simples pour structurer ta prochaine création.</p>
+      </div>
+
+      <div class="feature-grid">
+        <article class="feature-card">
+          <div class="feature-icon">✦</div>
+          <h3>Prompt détaillé</h3>
+          <p>Transforme ton idée en une description précise de ta vidéo.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon">▤</div>
+          <h3>Storyboard</h3>
+          <p>Découpe ton concept en scènes organisées.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon">◷</div>
+          <h3>Gestion de projets</h3>
+          <p>Enregistre et retrouve tes créations facilement.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- CRÉATEUR -->
+    <section class="page" id="creator">
+      <div class="page-heading">
+        <span class="eyebrow">✦ MOTION AI STUDIO</span>
+        <h1>Créons quelque chose de <span>grand.</span></h1>
+        <p>Réponds aux questions pour construire ton prompt vidéo.</p>
+      </div>
+
+      <div class="creator-layout">
+        <div class="creator-main">
+          <div class="progress-container">
+            <div class="progress-info">
+              <span id="step-label">ÉTAPE 1 SUR 7</span>
+              <span id="progress-percent">14%</span>
+            </div>
+            <div class="progress-track">
+              <div id="progress-bar"></div>
+            </div>
+          </div>
+
+          <div class="question-card">
+            <div id="question-content"></div>
+
+            <div class="creator-navigation">
+              <button class="secondary-button" id="previous-step">← Retour</button>
+              <button class="primary-button" id="next-step">Continuer →</button>
+            </div>
+          </div>
+        </div>
+
+        <aside class="creator-sidebar">
+          <div class="sidebar-card">
+            <span class="eyebrow">TON PROJET</span>
+            <h3>Creative brief</h3>
+            <p>Construis ton concept étape par étape.</p>
+            <div class="brief-line"><span>Type</span><strong id="brief-type">À définir</strong></div>
+            <div class="brief-line"><span>Style</span><strong id="brief-style">À définir</strong></div>
+            <div class="brief-line"><span>Durée</span><strong id="brief-duration">À définir</strong></div>
+            <div class="brief-line"><span>Format</span><strong id="brief-format">À définir</strong></div>
+          </div>
+          <div class="tip-card">
+            <span>✦ CONSEIL</span>
+            <p>Plus ton idée est précise, plus ton prompt sera détaillé.</p>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- RÉSULTAT -->
+    <section class="page" id="result">
+      <div class="page-heading">
+        <span class="eyebrow">✦ CRÉATION TERMINÉE</span>
+        <h1>Ton concept est <span>prêt.</span></h1>
+        <p>Voici le résultat de ta création.</p>
+      </div>
+
+      <div class="result-card">
+        <div class="result-header">
+          <div>
+            <span class="eyebrow">VIDEO PROMPT</span>
+            <h2>Ton prompt vidéo</h2>
+          </div>
+          <button class="secondary-button" id="copy-prompt">Copier le prompt</button>
+        </div>
+        <div id="generated-prompt" class="generated-prompt"></div>
+      </div>
+
+      <div class="result-card storyboard-card">
+        <span class="eyebrow">VISUAL BREAKDOWN</span>
+        <h2>Ton storyboard</h2>
+        <div id="storyboard-content"></div>
+      </div>
+
+      <div class="result-actions">
+        <button class="primary-button" id="save-project">Enregistrer le projet</button>
+        <button class="secondary-button" id="new-project">Nouvelle création</button>
+      </div>
+    </section>
+
+    <!-- GUIDE -->
+    <section class="page" id="guide">
+      <div class="page-heading">
+        <span class="eyebrow">COMMENT ÇA MARCHE ?</span>
+        <h1>Simple. Rapide. <span>Créatif.</span></h1>
+        <p>MOTION AI t'accompagne de l'idée au prompt final.</p>
+      </div>
+
+      <div class="guide-grid">
+        <article class="guide-card">
+          <span class="guide-number">01</span>
+          <h2>Décris ton idée</h2>
+          <p>Présente le concept de ta vidéo avec tes propres mots.</p>
+        </article>
+        <article class="guide-card">
+          <span class="guide-number">02</span>
+          <h2>Personnalise</h2>
+          <p>Choisis le style, la durée, le format et l'ambiance.</p>
+        </article>
+        <article class="guide-card">
+          <span class="guide-number">03</span>
+          <h2>Génère</h2>
+          <p>Obtiens un prompt détaillé et un storyboard structuré.</p>
+        </article>
+        <article class="guide-card">
+          <span class="guide-number">04</span>
+          <h2>Utilise ton résultat</h2>
+          <p>Copie ton prompt et utilise-le dans ton outil de génération vidéo.</p>
+        </article>
+      </div>
+
+      <div class="notice-card">
+        <strong>À savoir</strong>
+        <p>MOTION AI crée des prompts et des storyboards. Il ne génère pas directement les vidéos.</p>
+      </div>
+    </section>
+
+    <!-- HISTORIQUE -->
+    <section class="page" id="history">
+      <div class="page-heading">
+        <span class="eyebrow">TON ESPACE PERSONNEL</span>
+        <h1>Mes <span>projets.</span></h1>
+        <p>Retrouve les créations enregistrées sur cet appareil.</p>
+      </div>
+
+      <div id="projects-list" class="projects-list"></div>
+      <div id="empty-projects" class="empty-state">
+        <div class="empty-icon">▤</div>
+        <h2>Aucun projet pour le moment</h2>
+        <p>Tes prochaines créations apparaîtront ici.</p>
+        <button class="primary-button" data-page="creator">Créer mon premier projet →</button>
+      </div>
+    </section>
+
+    <!-- COMPTE -->
+    <section class="page" id="account">
+      <div class="page-heading">
+        <span class="eyebrow">ESPACE PERSONNEL</span>
+        <h1>Ton <span>compte.</span></h1>
+        <p>Gère ton profil MOTION AI.</p>
+      </div>
+
+      <div class="account-card">
+        <div id="account-content"></div>
+        <div id="account-actions"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <a href="#" class="brand" data-page="home">
+      <span class="brand-icon">M</span>
+      <span>MOTION <strong>AI</strong></span>
+    </a>
+    <p>CREATE · IMAGINE · BUILD</p>
+    <span>© 2026 MOTION AI</span>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+</div>
+</body>
+</html>
